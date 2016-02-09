@@ -144,10 +144,14 @@ function books_move($book_id, $to_id) {
     check_permission(PERM_ADMIN);
 
     // to avoid loops
-    foreach (get_book_parents($book_id, true) as $to) {
-        if ($book_id == $to['id'])
+    foreach (get_book_parents($to_id, true) as $parent) {
+        if ($book_id == $parent['id'])
             throw new UnexpectedValueException();
     }
+
+    // forbid moving to a book which has paragraphs
+    if (sizeof(sql_pe("SELECT par_id FROM paragraphs WHERE book_id = ?", array($to_id))) > 0)
+        throw new Exception("Target book has paragraphs");
 
     sql_pe("UPDATE `books` SET parent_id=? WHERE book_id=? LIMIT 1", array($to_id, $book_id));
 }
