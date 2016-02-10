@@ -17,7 +17,7 @@ switch ($action) {
         header("Location:sentence.php?id=$id");
         break;
     case 'save_src':
-        sentence_save_source($id, $_POST['src_text']);
+        sentence_save_source($id, POST('src_text'));
         header("Location:sentence.php?id=$id");
         break;
     default:

@@ -54,7 +54,7 @@ switch ($action) {
         }
         break;
     case 'pause':
-        $smarty->assign('next_pool_id', get_next_pool($_SESSION['user_id'], (int)$_GET['pool_id']));
+        $smarty->assign('next_pool_id', get_next_pool($_SESSION['user_id'], (int)GET('pool_id')));
         if (game_is_on()) {
             $am2 = new AchievementsManager($_SESSION['user_id']);
             $smarty->assign('achievement', $am2->get_closest());

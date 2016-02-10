@@ -9,15 +9,15 @@ $action = GET('act', '');
 
 switch ($action) {
     case 'add_type':
-        add_morph_pool_type($_POST['gram'], $_POST['descr'], $_POST['pool_name']);
+        add_morph_pool_type(POST('gram'), POST('descr'), POST('pool_name'));
         header("Location:pools.php?added&type=1");
         break;
     case 'delete':
-        delete_morph_pool($_GET['pool_id']);
+        delete_morph_pool(GET('pool_id'));
         header("Location:pools.php");
         break;
     case 'candidates':
-        $smarty->assign('data', get_pool_candidates_page($_GET['pool_type']));
+        $smarty->assign('data', get_pool_candidates_page(GET('pool_type')));
         $smarty->assign('default_size', MA_DEFAULT_POOL_SIZE);
         $smarty->display('qa/pool_candidates.tpl');
         break;
@@ -33,9 +33,10 @@ switch ($action) {
         break;
     case 'samples':
         if (isset($_GET['tabs'])) {
-            $smarty->assign('pool', get_morph_samples_page($_GET['pool_id'], true, 100));
+            $pool_id = (int)GET('pool_id');
+            $smarty->assign('pool', get_morph_samples_page($pool_id, true, 100));
             header("Content-type: application/csv; charset=utf-8");
-            header("Content-disposition: attachment; filename=pool_".(int)$_GET['pool_id'].".tab");
+            header("Content-disposition: attachment; filename=pool_{$pool_id}.tab");
             $smarty->display('qa/pool_tabs.tpl');
         }
         else {
@@ -50,7 +51,7 @@ switch ($action) {
 
             $smarty->assign('sortby', GET('sortby', ''));
             $smarty->assign('pool', get_morph_samples_page(
-                $_GET['pool_id'],
+                GET('pool_id'),
                 isset($_GET['ext']),
                 $config['misc']['morph_annot_moder_context_size'],
                 GET('skip', 0),
@@ -63,35 +64,35 @@ switch ($action) {
         break;
     case 'promote':
         check_permission(PERM_MORPH_MODER);
-        promote_samples((int)$_GET['pool_type'],
-                        $_POST['type'],
-                        (int)$_POST[$_POST['type']."_n"],
-                        (int)$_POST['pools_num'],
+        promote_samples((int)GET('pool_type'),
+                        POST('type'),
+                        (int)POST(POST('type')."_n"),
+                        (int)POST('pools_num'),
                         $_SESSION['user_id']);
         header("Location:pools.php?type=2");
         break;
     case 'publish':
-        publish_pool($_GET['pool_id']);
-        header("Location:pools.php?act=samples&pool_id=".$_GET['pool_id']);
+        publish_pool(GET('pool_id'));
+        header("Location:pools.php?act=samples&pool_id=".GET('pool_id'));
         break;
     case 'unpublish':
-        unpublish_pool($_GET['pool_id']);
-        header("Location:pools.php?act=samples&pool_id=".$_GET['pool_id']);
+        unpublish_pool(GET('pool_id'));
+        header("Location:pools.php?act=samples&pool_id=".GET('pool_id'));
         break;
     case 'begin_moder':
-        moderate_pool($_GET['pool_id']);
-        header("Location:pools.php?act=samples&pool_id=".$_GET['pool_id']);
+        moderate_pool(GET('pool_id'));
+        header("Location:pools.php?act=samples&pool_id=".GET('pool_id'));
         break;
     case 'agree':
-        moder_agree_with_all($_GET['pool_id']);
-        header("Location:pools.php?act=samples&pool_id=".$_GET['pool_id']);
+        moder_agree_with_all(GET('pool_id'));
+        header("Location:pools.php?act=samples&pool_id=".GET('pool_id'));
         break;
     case 'finish_moder':
-        finish_moderate_pool($_GET['pool_id']);
+        finish_moderate_pool(GET('pool_id'));
         header("Location:index.php?page=pool_charts");
         break;
     case 'begin_merge':
-        begin_pool_merge($_GET['pool_id']);
+        begin_pool_merge(GET('pool_id'));
         header("Location:index.php?page=pool_charts");
         break;
     default:
@@ -99,14 +100,14 @@ switch ($action) {
         $type = GET('type', 0);
         $smarty->assign('type', $type);
         if ($type == MA_POOLS_STATUS_FOUND_CANDIDATES) {
-            $types = get_morph_pool_types($_GET['filter']);
+            $types = get_morph_pool_types(GET('filter'));
             uasort($types, function ($a, $b) {
                 return $a['found_samples'] < $b['found_samples'] ? 1 : -1;
             });
             $smarty->assign('types', $types);
             $smarty->display('qa/pools_notready.tpl');
         } else {
-            $smarty->assign('pools', get_morph_pools_page($type, (int)$_GET['moder_id'], $_GET['filter']));
+            $smarty->assign('pools', get_morph_pools_page($type, (int)GET('moder_id'), GET('filter')));
             $smarty->display('qa/pools.tpl');
         }
 }

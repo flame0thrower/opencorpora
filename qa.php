@@ -3,9 +3,7 @@ require('lib/header.php');
 require('lib/lib_qa.php');
 require('lib/lib_morph_pools.php');
 
-$action = '';
-if (isset($_GET['act']))
-    $action = $_GET['act'];
+$action = GET('act', '');
 
 switch ($action) {
     case 'sent_split':

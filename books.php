@@ -136,14 +136,14 @@ else {
             header("Location:books.php?book_id=$book_id");
             break;
         case 'del_tag':
-            $book_id = $_GET['book_id'];
-            $tag_name = $_GET['tag_name'];
+            $book_id = GET('book_id');
+            $tag_name = GET('tag_name');
             books_del_tag($book_id, $tag_name);
             header("Location:books.php?book_id=$book_id");
             break;
         case 'merge_sentences':
-            $sent1 = $_POST['id1'];
-            $sent2 = $_POST['id2'];
+            $sent1 = POST('id1');
+            $sent2 = POST('id2');
             merge_sentences($sent1, $sent2);
             header("Location:sentence.php?id=$sent1");
             break;
@@ -156,25 +156,25 @@ else {
             header("Location:books.php?book_id=".$a[0]."&full#sen".$a[1]);
             break;
         case 'split_paragraph':
-            $sent_id = $_GET['sid'];
+            $sent_id = GET('sid');
             $book_id = split_paragraph($sent_id);
             header("Location:books.php?book_id=$book_id&full#sen$sent_id");
             break;
         case 'merge_paragraph':
-            list($book_id, $sent_id) = merge_paragraphs($_GET['pid']);
+            list($book_id, $sent_id) = merge_paragraphs(GET('pid'));
             header("Location:books.php?book_id=$book_id&full#sen$sent_id");
             break;
         case 'del_sentence':
-            delete_sentence($_GET['sid']);
-            header("Location:books.php?book_id=".$_GET['book_id'].'&full');
+            delete_sentence(GET('sid'));
+            header("Location:books.php?book_id=".GET('book_id').'&full');
             break;
         case 'del_paragraph':
-            delete_paragraph($_GET['pid']);
-            header("Location:books.php?book_id=".$_GET['book_id'].'&full');
+            delete_paragraph(GET('pid'));
+            header("Location:books.php?book_id=".GET('book_id').'&full');
             break;
         case 'move':
-            books_move($_POST['book_id'], $_POST['book_to']);
-            header("Location:books.php?book_id=$book_to");
+            books_move(POST('book_id'), POST('book_to'));
+            header("Location:books.php?book_id=".POST('book_to'));
             break;
     }
 }

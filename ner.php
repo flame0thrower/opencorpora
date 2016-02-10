@@ -15,7 +15,7 @@ $tagset_id = get_current_tagset();
 switch ($action) {
 
     case 'manual':
-        $smarty->assign('content', get_wiki_page("nermanual/" . (int)$_GET['id']));
+        $smarty->assign('content', get_wiki_page("nermanual/" . (int)GET('id')));
         $smarty->display('static/doc/annotation.tpl');
         break;
 

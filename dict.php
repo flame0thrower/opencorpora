@@ -12,7 +12,7 @@ switch ($action) {
         header("Location:dict.php?act=gram");
         break;
     case 'del_gram':
-        del_grammem($_GET['id']);
+        del_grammem(GET('id'));
         header("Location:dict.php?act=gram");
         break;
     case 'edit_gram':
@@ -28,7 +28,7 @@ switch ($action) {
         header("Location:dict.php?act=errata");
         break;
     case 'not_error':
-        mark_dict_error_ok($_GET['error_id'], $_POST['comm']);
+        mark_dict_error_ok(GET('error_id'), POST('comm'));
         header("Location:dict.php?act=errata");
         break;
     case 'add_restr':
@@ -36,7 +36,7 @@ switch ($action) {
         header("Location:dict.php?act=gram_restr");
         break;
     case 'del_restr':
-        del_dict_restriction($_GET['id']);
+        del_dict_restriction(GET('id'));
         header("Location:dict.php?act=gram_restr");
         break;
     case 'update_restr':
@@ -61,15 +61,15 @@ switch ($action) {
         header("Location:dict.php?act=edit&id=".$_POST['from_id']);
         break;
     case 'del_link':
-        del_link($_GET['id']);
-        header("Location:dict.php?act=edit&id=".$_GET['lemma_id']);
+        del_link(GET('id'));
+        header("Location:dict.php?act=edit&id=".GET('lemma_id'));
         break;
     case 'change_link_dir':
-        change_link_direction($_GET['id']);
-        header("Location:dict.php?act=edit&id=".$_GET['lemma_id']);
+        change_link_direction(GET('id'));
+        header("Location:dict.php?act=edit&id=".GET('lemma_id'));
         break;
     case 'del_lemma':
-        del_lemma($_GET['lemma_id']);
+        del_lemma(GET('lemma_id'));
         header("Location:dict.php");
         break;
     case 'lemmata':
@@ -88,7 +88,7 @@ switch ($action) {
         $smarty->display('dict/restrictions.tpl');
         break;
     case 'edit':
-        $smarty->assign('editor', get_lemma_editor($_GET['id']));
+        $smarty->assign('editor', get_lemma_editor(GET('id')));
         $smarty->assign('link_types', get_link_types());
         $smarty->assign('possible_grammems', dict_get_select_gram());
         $smarty->display('dict/lemma_edit.tpl');
