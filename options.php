@@ -2,10 +2,7 @@
 require('lib/header.php');
 require_once('lib/lib_achievements.php');
 
-if (isset($_GET['act'])) {
-    $action = $_GET['act'];
-} else
-    $action = '';
+$action = GET('act', '');
 
 switch ($action) {
     case 'save':

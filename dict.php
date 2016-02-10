@@ -1,9 +1,8 @@
 <?php
 require('lib/header.php');
 require('lib/lib_dict.php');
-if (isset($_GET['act']))
-    $action = $_GET['act'];
-else $action = '';
+
+$action = GET('act', '');
 
 $smarty->assign('active_page', 'dict');
 
@@ -78,7 +77,7 @@ switch ($action) {
         $smarty->display('dict/lemmata.tpl');
         break;
     case 'gram':
-        $order = isset($_GET['order']) ? $_GET['order'] : '';
+        $order = GET('order', '');
         $smarty->assign('grammems', get_grammem_editor($order));
         $smarty->assign('order', $order);
         $smarty->assign('select', dict_get_select_gram());
@@ -99,7 +98,7 @@ switch ($action) {
         $smarty->display('dict/errata.tpl');
         break;
     case 'pending':
-        $skip = isset($_GET['skip']) ? $_GET['skip'] : 0;
+        $skip = GET('skip', 0);
         $smarty->assign('data', get_pending_updates($skip));
         $smarty->display('dict/pending.tpl');
         break;

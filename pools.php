@@ -5,7 +5,7 @@ require_once('lib/lib_xml.php');
 require_once('lib/lib_users.php');
 require_once('lib/lib_morph_pools.php');
 
-$action = isset($_GET['act']) ? $_GET['act'] : '';
+$action = GET('act', '');
 
 switch ($action) {
     case 'add_type':
@@ -39,7 +39,7 @@ switch ($action) {
             $smarty->display('qa/pool_tabs.tpl');
         }
         else {
-            $filter = isset($_GET['filter']) ? $_GET['filter'] : false;
+            $filter = GET('filter', false);
             $matches = NULL;
             if ($filter && !user_has_permission(PERM_MORPH_MODER) && preg_match('/^user:(\d+)$/', $filter, $matches)) {
                 if ($matches[1] != $_SESSION['user_id']) {
@@ -48,15 +48,15 @@ switch ($action) {
                 }
             }
 
-            $smarty->assign('sortby', isset($_GET['sortby']) ? $_GET['sortby'] : '');
+            $smarty->assign('sortby', GET('sortby', ''));
             $smarty->assign('pool', get_morph_samples_page(
                 $_GET['pool_id'],
                 isset($_GET['ext']),
                 $config['misc']['morph_annot_moder_context_size'],
-                isset($_GET['skip']) ? $_GET['skip'] : 0,
+                GET('skip', 0),
                 $filter,
                 (!user_has_permission(PERM_MORPH_MODER) || OPTION(OPT_MODER_SPLIT) == 1) ? $config['misc']['morph_annot_moder_page_size'] : 0,
-                isset($_GET['sortby']) ? $_GET['sortby'] : ''
+                GET('sortby', '')
             ));
             $smarty->display('qa/pool.tpl');
         }
@@ -95,8 +95,8 @@ switch ($action) {
         header("Location:index.php?page=pool_charts");
         break;
     default:
-        $smarty->assign('moder_id', isset($GET['moder_id']) ? $_GET['moder_id'] : 0);
-        $type = isset($_GET['type']) ? $_GET['type'] : 0;
+        $smarty->assign('moder_id', GET('moder_id', 0));
+        $type = GET('type', 0);
         $smarty->assign('type', $type);
         if ($type == MA_POOLS_STATUS_FOUND_CANDIDATES) {
             $types = get_morph_pool_types($_GET['filter']);

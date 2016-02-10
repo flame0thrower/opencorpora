@@ -535,7 +535,7 @@ function delete_token($tf_id, $delete_history=true) {
 
     sql_commit();
 }
-function merge_tokens_ii($id_array) {
+function merge_tokens_ii(array $id_array) {
     //ii stands for "id insensitive"
     if (sizeof($id_array) < 2)
         throw new UnexpectedValueException();

@@ -5,10 +5,10 @@ require_once('../lib/lib_achievements.php');
 
 $result['status'] = 1;
 try {
-    if (!isset($_POST['id']) || (!isset($_POST['answer']) && !isset($_POST['status'])))
+    if (!isset($_POST['answer']) && !isset($_POST['status']))
         throw new UnexpectedValueException();
 
-    $id = (int)$_POST['id'];
+    $id = (int)POST('id');
     $answer = isset($_POST['answer']) ? (int)$_POST['answer'] : (int)$_POST['status'];
 
     if (isset($_POST['mw']) && $_POST['mw'] == 1) {

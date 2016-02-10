@@ -1,9 +1,7 @@
 <?php
 require('lib/header.php');
 require('lib/lib_tokenizer.php');
-if (isset($_GET['act']))
-    $action = $_GET['act'];
-else $action = '';
+$action = GET('act', '');
 
 switch ($action) {
     case 'add':

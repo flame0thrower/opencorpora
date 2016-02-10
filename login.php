@@ -1,9 +1,7 @@
 <?php
 require('lib/header.php');
 
-if (isset($_GET['act']))
-    $action = $_GET['act'];
-else $action = '';
+$action = GET('act', '');
 
 if (isset($_SESSION['user_id']) && in_array($action, array('', 'login', 'login_openid', 'register'))) {
     header("Location:index.php");

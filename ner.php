@@ -9,7 +9,7 @@ $smarty->assign('active_page', 'tasks');
 
 check_logged();
 
-$action = isset($_GET['act']) ? $_GET['act'] : '';
+$action = GET('act', '');
 $tagset_id = get_current_tagset();
 
 switch ($action) {

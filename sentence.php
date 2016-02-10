@@ -6,15 +6,10 @@ require_once('lib/lib_anaphora_syntax.php');
 require_once('lib/lib_dict.php');
 require_once('lib/lib_users.php');
 require_once('lib/lib_books.php');
-if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-} else {
-    header('Location:index.php');
-    return;
-}
 
-$action = isset($_GET['act']) ? $_GET['act'] : '';
-$mode = isset($_GET['mode']) ? $_GET['mode'] : 'morph';
+$id = (int)GET('id');
+$action = GET('act', '');
+$mode = GET('mode', 'morph');
 
 switch ($action) {
     case 'save':

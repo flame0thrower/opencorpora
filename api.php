@@ -61,10 +61,8 @@ switch ($action) {
         $answer['answer'] = array('tasks' => get_available_tasks($user_id, true));
         break;
     case 'get_morph_task':
-        if (empty($_POST['pool_id']) || empty($_POST['size']))
-            throw new UnexpectedValueException("Wrong args");
         // timeout is in seconds
-        $answer['answer'] = get_annotation_packet($_POST['pool_id'], $_POST['size'], $user_id, $_POST['timeout']);
+        $answer['answer'] = get_annotation_packet(POST('pool_id'), POST('size'), $user_id, POST('timeout'));
         break;
     case 'update_morph_task':
         throw new Exception("Not implemented");

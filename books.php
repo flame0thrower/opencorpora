@@ -5,9 +5,10 @@ require_once('lib/lib_anaphora_syntax.php');
 require_once('lib/lib_ne.php');
 require_once('lib/lib_users.php');
 
-$action = isset($_GET['act']) ? $_GET['act'] : '';
+$action = GET('act', '');
 if (!$action) {
-    if (isset($_GET['book_id']) && $book_id = $_GET['book_id']) {
+    $book_id = GET('book_id', 0);
+    if ($book_id) {
         $smarty->assign('book', get_book_page($book_id, isset($_GET['full'])));
         $smarty->display('book.tpl');
     } else {
@@ -17,104 +18,98 @@ if (!$action) {
 }
 elseif ($action == 'anaphora') {
     check_permission(PERM_SYNTAX);
-    if (isset($_GET['book_id']) && $book_id = $_GET['book_id']) {
-        $book = get_book_page($book_id, TRUE);
-        $groups = array();
-        $smarty->assign('group_types', get_syntax_group_types());
+    $book_id = GET('book_id');
+    $book = get_book_page($book_id, TRUE);
+    $groups = array();
+    $smarty->assign('group_types', get_syntax_group_types());
 
-        foreach ($book['paragraphs'] as &$paragraph) {
+    foreach ($book['paragraphs'] as &$paragraph) {
 
-            foreach ($paragraph['sentences'] as &$sentence) {
-                $sentence['props'] = get_pronouns_by_sentence($sentence['id']);
-                foreach ($sentence['tokens'] as &$token) {
-                    $groups[$token['id']] = $token['groups']
-                        = get_moderated_groups_by_token($token['id']);
-                }
+        foreach ($paragraph['sentences'] as &$sentence) {
+            $sentence['props'] = get_pronouns_by_sentence($sentence['id']);
+            foreach ($sentence['tokens'] as &$token) {
+                $groups[$token['id']] = $token['groups']
+                    = get_moderated_groups_by_token($token['id']);
             }
         }
-
-        $smarty->assign('anaphora', get_anaphora_by_book($book_id));
-        $smarty->assign('book', $book);
-        $smarty->assign('token_groups', $groups);
-        $smarty->display('syntax/book.tpl');
-    } else {
-        throw new UnexpectedValueException();
     }
+
+    $smarty->assign('anaphora', get_anaphora_by_book($book_id));
+    $smarty->assign('book', $book);
+    $smarty->assign('token_groups', $groups);
+    $smarty->display('syntax/book.tpl');
 }
 
 elseif ($action == 'ner') {
     //check_permission(PERM_SYNTAX);
     check_logged();
-    if (isset($_GET['book_id']) && $book_id = $_GET['book_id']) {
+    $book_id = GET('book_id');
 
-        $tagset_id = get_current_tagset();
-        $is_book_moderator = is_user_book_moderator($book_id, $tagset_id);
+    $tagset_id = get_current_tagset();
+    $is_book_moderator = is_user_book_moderator($book_id, $tagset_id);
 
-        $book = get_book_page($book_id, TRUE, TRUE);
-        // список из статусов => список id параграфов
-        $paragraphs_status = get_ne_paragraph_status($book_id, $_SESSION['user_id'], $tagset_id);
+    $book = get_book_page($book_id, TRUE, TRUE);
+    // список из статусов => список id параграфов
+    $paragraphs_status = get_ne_paragraph_status($book_id, $_SESSION['user_id'], $tagset_id);
 
-        foreach ($book['paragraphs'] as &$paragraph) {
-            // и для модератора, и для простого юзера забираем "свою" разметку
-            $ne = get_ne_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
-            $mentions = get_ne_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id, TRUE);
+    foreach ($book['paragraphs'] as &$paragraph) {
+        // и для модератора, и для простого юзера забираем "свою" разметку
+        $ne = get_ne_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
+        $mentions = get_ne_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id, TRUE);
 
-            $paragraph['named_entities'] = isset($ne['entities']) ? $ne['entities'] : array();
-            $paragraph['mentions'] = isset($mentions['entities']) ? $mentions['entities'] : array();
+        $paragraph['named_entities'] = isset($ne['entities']) ? $ne['entities'] : array();
+        $paragraph['mentions'] = isset($mentions['entities']) ? $mentions['entities'] : array();
 
-            $paragraph['annotation_id'] = isset($ne['annot_id']) ? $ne['annot_id'] : 0;
-            $paragraph['ne_by_token'] = get_ne_tokens_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
-            $paragraph['comments'] = get_comments_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
+        $paragraph['annotation_id'] = isset($ne['annot_id']) ? $ne['annot_id'] : 0;
+        $paragraph['ne_by_token'] = get_ne_tokens_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
+        $paragraph['comments'] = get_comments_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
 
-            $paragraph['mine'] = false;
-            if (in_array($paragraph['id'], $paragraphs_status['unavailable']) or
-                in_array($paragraph['id'], $paragraphs_status['done_by_user'])) {
-                $paragraph['disabled'] = true;
-            }
-            elseif (in_array($paragraph['id'], $paragraphs_status['started_by_user'])) {
-                $paragraph['mine'] = true;
-            }
-
-            if (in_array($paragraph['id'], $paragraphs_status['done_by_user'])) {
-                $paragraph['done_by_me'] = true;
-            }
-
-            // если текущий пользователь - модератор, забираем разметку других пользователей
-            if (!$is_book_moderator) continue;
-
-            $annotators = get_paragraph_annotators($paragraph['id'], $tagset_id);
-            $paragraph['all_annotations'] = array();
-
-            foreach ($annotators as $user_id) {
-                $paragraph['all_annotations'][$user_id] = array();
-                $PAR = &$paragraph['all_annotations'][$user_id];
-
-                $ne = get_ne_by_paragraph($paragraph['id'], $user_id, $tagset_id);
-                $mentions = get_ne_by_paragraph($paragraph['id'], $user_id, $tagset_id, TRUE);
-
-                $PAR['named_entities'] = isset($ne['entities']) ? $ne['entities'] : array();
-                $PAR['mentions'] = isset($mentions['entities']) ? $mentions['entities'] : array();
-                $PAR['user_shown_name'] = get_user_shown_name($user_id);
-
-                $PAR['annotation_id'] = isset($ne['annot_id']) ? $ne['annot_id'] : 0;
-                $PAR['ne_by_token'] = get_ne_tokens_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
-                $PAR['comments'] = get_comments_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
-            }
+        $paragraph['mine'] = false;
+        if (in_array($paragraph['id'], $paragraphs_status['unavailable']) or
+            in_array($paragraph['id'], $paragraphs_status['done_by_user'])) {
+            $paragraph['disabled'] = true;
+        }
+        elseif (in_array($paragraph['id'], $paragraphs_status['started_by_user'])) {
+            $paragraph['mine'] = true;
         }
 
-        $smarty->assign('book', $book);
-        $smarty->assign('use_fast_mode', OPTION(OPT_NE_QUICK));
-        $smarty->assign('possible_guidelines',
-            array(1 => "Default (2014)", 2 => "Dialogue Eval (2016)"));
-        $smarty->assign('current_guideline', OPTION(OPT_NE_TAGSET));
+        if (in_array($paragraph['id'], $paragraphs_status['done_by_user'])) {
+            $paragraph['done_by_me'] = true;
+        }
 
-        $smarty->assign('entity_types', get_ne_types($tagset_id));
-        $smarty->assign('mention_types', get_object_types($tagset_id));
-        $smarty->assign('is_moderator', $is_book_moderator);
-        $smarty->display('ner/book.tpl');
-    } else {
-        throw new UnexpectedValueException();
+        // если текущий пользователь - модератор, забираем разметку других пользователей
+        if (!$is_book_moderator) continue;
+
+        $annotators = get_paragraph_annotators($paragraph['id'], $tagset_id);
+        $paragraph['all_annotations'] = array();
+
+        foreach ($annotators as $user_id) {
+            $paragraph['all_annotations'][$user_id] = array();
+            $PAR = &$paragraph['all_annotations'][$user_id];
+
+            $ne = get_ne_by_paragraph($paragraph['id'], $user_id, $tagset_id);
+            $mentions = get_ne_by_paragraph($paragraph['id'], $user_id, $tagset_id, TRUE);
+
+            $PAR['named_entities'] = isset($ne['entities']) ? $ne['entities'] : array();
+            $PAR['mentions'] = isset($mentions['entities']) ? $mentions['entities'] : array();
+            $PAR['user_shown_name'] = get_user_shown_name($user_id);
+
+            $PAR['annotation_id'] = isset($ne['annot_id']) ? $ne['annot_id'] : 0;
+            $PAR['ne_by_token'] = get_ne_tokens_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
+            $PAR['comments'] = get_comments_by_paragraph($paragraph['id'], $_SESSION['user_id'], $tagset_id);
+        }
     }
+
+    $smarty->assign('book', $book);
+    $smarty->assign('use_fast_mode', OPTION(OPT_NE_QUICK));
+    $smarty->assign('possible_guidelines',
+        array(1 => "Default (2014)", 2 => "Dialogue Eval (2016)"));
+    $smarty->assign('current_guideline', OPTION(OPT_NE_TAGSET));
+
+    $smarty->assign('entity_types', get_ne_types($tagset_id));
+    $smarty->assign('mention_types', get_object_types($tagset_id));
+    $smarty->assign('is_moderator', $is_book_moderator);
+    $smarty->display('ner/book.tpl');
 }
 
 else {

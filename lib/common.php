@@ -25,6 +25,23 @@ function oc_exception_handler($exception) {
     else
         show_error("Произошла ошибка.<br/><br/>" . $exception->getMessage());
 }
+
+function ENSURE($array, $param_name, $default_val) {
+    if (isset($array[$param_name]))
+        return $array[$param_name];
+    if (!is_null($default_val))
+        return $default_val;
+    throw new UnexpectedValueException("Wrong args: missing $param_name");
+}
+
+function POST($param_name, $value_if_not_set = NULL) {
+    return ENSURE($_POST, $param_name, $value_if_not_set);
+}
+
+function GET($param_name, $value_if_not_set = NULL) {
+    return ENSURE($_GET, $param_name, $value_if_not_set);
+}
+
 function create_revset($comment = '') {
     if (!isset($_SESSION['user_id']) || !$_SESSION['user_id'])
         throw new Exception();

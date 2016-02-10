@@ -3,7 +3,7 @@ require_once('lib/header.php');
 require_once('lib/lib_anaphora_syntax.php');
 
 
-$action = isset($_GET['act']) ? $_GET['act'] : '';
+$action = GET('act', '');
 
 switch ($action) {
     case 'finish_moder':
