@@ -10,7 +10,7 @@ if (isset($_SESSION['user_id']) && in_array($action, array('', 'login', 'login_o
 
 switch($action) {
     case 'login':
-        if (user_login($_POST['login'], $_POST['passwd'])) {
+        if (user_login(POST('login'), POST('passwd'))) {
             if (isset($_SESSION['return_to']))
                 header('Location:'.$_SESSION['return_to']);
             else
@@ -21,7 +21,7 @@ switch($action) {
         log_timing();
         exit();
     case 'login_openid':
-        $r = user_login_openid($_POST['token']);
+        $r = user_login_openid(POST('token'));
         switch ($r) {
             case 1:
                 if (isset($_SESSION['return_to']))
@@ -67,10 +67,10 @@ switch($action) {
         $smarty->assign('change_status', user_change_email($_POST));
         break;
     case 'generate_passwd':
-        $smarty->assign('gen_status', user_generate_password($_POST['email']));
+        $smarty->assign('gen_status', user_generate_password(POST('email')));
         break;
     case 'change_name':
-        $smarty->assign('change_status', user_change_shown_name($_POST['shown_name']));
+        $smarty->assign('change_status', user_change_shown_name(POST('shown_name')));
         break;
 }
 log_timing();

@@ -11,7 +11,7 @@ try {
     $id = (int)POST('id');
     $answer = isset($_POST['answer']) ? (int)$_POST['answer'] : (int)$_POST['status'];
 
-    if (isset($_POST['mw']) && $_POST['mw'] == 1) {
+    if (POST('mw', 0)) {
         require_once('../lib/lib_multiwords.php');
         check_permission(PERM_MULTITOKENS);
         MultiWordTask::register_answer($id, $_SESSION['user_id'], $answer);
@@ -20,7 +20,7 @@ try {
         if (isset($_POST['status']))
             $result['status'] = save_moderated_status($id, $answer);
         else
-            $result['status'] = save_moderated_answer($id, $answer, (int)$_POST['manual']);
+            $result['status'] = save_moderated_answer($id, $answer, (int)POST('manual'));
     } else {
         check_logged();
         update_annot_instance($id, $answer);

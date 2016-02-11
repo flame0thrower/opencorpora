@@ -5,8 +5,8 @@ $action = GET('act', '');
 
 switch ($action) {
     case 'add':
-        $book_id = array_pop($_POST['book']);
-        addtext_add($_POST['source_text'], $_POST['sentence'], (int)$book_id, (int)$_POST['newpar']);
+        $book_id = array_pop(POST('book'));
+        addtext_add(POST('source_text'), POST('sentence'), (int)$book_id, (int)POST('newpar'));
         header("Location:books.php?book_id=$book_id");
         break;
     case 'check':
@@ -15,9 +15,7 @@ switch ($action) {
         break;
     default:
         check_permission(PERM_ADDER);
-        if (isset($_POST['txt'])) {
-            $smarty->assign('txt', $_POST['txt']);
-        }
+        $smarty->assign('txt', POST('txt', ''));
         $smarty->display('addtext.tpl');
 }
 

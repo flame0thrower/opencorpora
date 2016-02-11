@@ -8,7 +8,7 @@ $smarty->assign('active_page', 'dict');
 
 switch ($action) {
     case 'add_gram':
-        add_grammem($_POST['g_name'], $_POST['parent_gram'], $_POST['outer_id'], $_POST['descr']);
+        add_grammem(POST('g_name'), POST('parent_gram'), POST('outer_id'), POST('descr'));
         header("Location:dict.php?act=gram");
         break;
     case 'del_gram':
@@ -16,10 +16,10 @@ switch ($action) {
         header("Location:dict.php?act=gram");
         break;
     case 'edit_gram':
-        $id = $_POST['id'];
-        $inner_id = $_POST['inner_id'];
-        $outer_id = $_POST['outer_id'];
-        $descr = $_POST['descr'];
+        $id = POST('id');
+        $inner_id = POST('inner_id');
+        $outer_id = POST('outer_id');
+        $descr = POST('descr');
         edit_grammem($id, $inner_id, $outer_id, $descr);
         header('Location:dict.php?act=gram');
         break;
@@ -57,8 +57,8 @@ switch ($action) {
         header("Location:dict.php?act=edit&saved&id=$lemma_id");
         break;
     case 'add_link':
-        add_link($_POST['from_id'], $_POST['lemma_id'], $_POST['link_type']);
-        header("Location:dict.php?act=edit&id=".$_POST['from_id']);
+        add_link(POST('from_id'), POST('lemma_id'), POST('link_type'));
+        header("Location:dict.php?act=edit&id=".POST('from_id'));
         break;
     case 'del_link':
         del_link(GET('id'));
@@ -103,7 +103,7 @@ switch ($action) {
         $smarty->display('dict/pending.tpl');
         break;
     case 'reannot':
-        update_pending_tokens($_POST['rev_id'], isset($_POST['smart_mode']) && $_POST['smart_mode'] == 'on');
+        update_pending_tokens(POST('rev_id'), POST('smart_mode', 0) == 'on');
         header("Location:dict.php?act=pending");
         break;
     case 'absent':

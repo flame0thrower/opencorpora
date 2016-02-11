@@ -115,8 +115,8 @@ elseif ($action == 'ner') {
 else {
     switch ($action) {
         case 'add':
-            $book_name = trim($_POST['book_name']);
-            $book_parent = $_POST['book_parent'];
+            $book_name = trim(POST('book_name'));
+            $book_parent = POST('book_parent');
             $book_id = books_add($book_name, $book_parent);
             if (isset($_POST['goto']))
                 header("Location:books.php?book_id=$book_id");
@@ -124,14 +124,14 @@ else {
                 header("Location:books.php?book_id=$book_parent");
             break;
         case 'rename':
-            $name = trim($_POST['new_name']);
-            $book_id = $_POST['book_id'];
+            $name = trim(POST('new_name'));
+            $book_id = POST('book_id');
             books_rename($book_id, $name);
             header("Location:books.php?book_id=$book_id");
             break;
         case 'add_tag':
-            $book_id = $_POST['book_id'];
-            $tag_name = $_POST['tag_name'];
+            $book_id = POST('book_id');
+            $tag_name = POST('tag_name');
             books_add_tag($book_id, $tag_name);
             header("Location:books.php?book_id=$book_id");
             break;
@@ -148,11 +148,11 @@ else {
             header("Location:sentence.php?id=$sent1");
             break;
         case 'split_token':
-            $val = split_token($_POST['tid'], $_POST['nc']);
+            $val = split_token(POST('tid'), POST('nc'));
             header("Location:books.php?book_id=".$val[0]."&full#sen".$val[1]);
             break;
         case 'split_sentence':
-            $a = split_sentence($_POST['tid']);
+            $a = split_sentence(POST('tid'));
             header("Location:books.php?book_id=".$a[0]."&full#sen".$a[1]);
             break;
         case 'split_paragraph':
